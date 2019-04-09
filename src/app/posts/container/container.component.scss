@@ -1,0 +1,48 @@
+button.add {
+  font-size: 0.8em;
+  font-weight: bold;
+  border: 1px solid gray;
+  border-radius: 0;
+  background-color: #fafafa;
+  transform: translateY(-4px);
+}
+.nav {
+  padding: 1em 0;
+  font-size: 0.9em;
+}
+.nav-link {
+  padding: 0 1em;
+  cursor: pointer;
+}
+.nav-link {
+  border-right: 1px solid black;
+}
+.nav-link.active {
+  color: black;
+  font-weight: bold;
+}
+.filter .form-group:first-child {
+  width: 8em;
+}
+.filter .form-group:not(:first-child) {
+  width: 10em;
+  margin-left: 0.5em;
+}
+.filter button {
+  background-color: #fafafa;
+  margin-left: 0.5em;
+  border: 1px solid gray;
+}
+.filter button:first-of-type {
+  margin-right: 0.5em;
+}
+.pagi input {
+  display: inline-block;
+  width: 4em;
+}
+.pagi button {
+  width: 34px;
+  display: inline-block;
+  background-color: #fafafa;
+  border: 1px solid gray;
+}

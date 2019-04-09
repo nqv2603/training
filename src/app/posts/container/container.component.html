@@ -1,0 +1,85 @@
+<div class="container-fluid pt-4">
+  <div class="row">
+    <div class="col-7">
+      <h4 class="d-inline-block m-0">Posts</h4>
+      <button type="button" class="btn px-2 py-1 ml-3 text-primary add">Add New</button>
+      <ul class="nav">
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status==''">All</a></li>
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='publish'">Published</a></li>
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='sticky'">Sticky</a></li>
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='future'">Scheduled</a></li>
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='draft'">Draft</a></li>
+        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='trash'">Trash</a></li>
+      </ul>
+      <form class="filter">
+        <div class="form-group d-inline-block">
+          <select class="form-control" name="" id="">
+            <option>Bulk Actions</option>
+          </select>
+        </div>
+        <button type="button" class="btn">Apply</button>
+        <div class="form-group d-inline-block">
+          <select class="form-control" name="" id="">
+            <option>All Dates</option>
+          </select>
+        </div>
+        <div class="form-group d-inline-block">
+          <select class="form-control" name="" id="">
+            <option>All Categories</option>
+          </select>
+        </div>
+        <button type="button" class="btn">Filter</button>
+      </form>
+    </div>
+    <div class="col-5">
+      <form>
+        <div class="form-group w-50 d-inline-block">
+          <input type="text" class="form-control" name="" id="" placeholder="">
+        </div>
+        <button class="btn btn-primary ml-1">Search Posts</button>
+        <div class="pagi">
+          <span class="mr-2">{{ dataService.total }} items</span>
+          <button type="button" class="btn mx-1 p-1" (click)="onFirst()" [disabled]="page<=1">«</button>
+          <button type="button" class="btn mx-1 p-1" (click)="onPrev()" [disabled]="page<=1">‹</button>
+          <input type="number" class="mx-1" name="page" min="1" [max]="dataService.totalPages" [(ngModel)]="page"
+            (ngModelChange)="onChangePage()">
+          <span class="mx-1">of {{ dataService.totalPages }}</span>
+          <button type="button" class="btn mx-1 p-1" (click)="onNext()"
+            [disabled]="page>=dataService.totalPages">›</button>
+          <button type="button" class="btn ml-1 p-1" (click)="onLast()"
+            [disabled]="page>=dataService.totalPages">»</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<table class="table table-striped mt-2">
+  <thead>
+    <tr>
+      <th scope="col"><input type="checkbox"></th>
+      <th scope="col">Title</th>
+      <th scope="col">Author</th>
+      <th scope="col">Categories</th>
+      <th scope="col">Tags</th>
+      <th scope="col"><i class="fa fa-comment"></i></th>
+      <th scope="col">Date</th>
+    </tr>
+    <tr *ngFor="let post of dataService.posts">
+      <td scope="row"><input type="checkbox"></td>
+      <td scope="row">{{ post.title?.rendered }}</td>
+      <td scope="row">{{ dataService.users[post.author]?.name }}</td>
+      <td scope="row">
+        <span *ngFor="let cateId of post.categories">
+          {{ dataService.categories[cateId]?.name }},
+        </span>
+      </td>
+      <td scope="row">
+        <span *ngFor="let tagId of post.tags">
+          {{ dataService.tags[tagId]?.name }},
+        </span>
+      </td>
+      <td scope="row">{{ post.comment_status }}</td>
+      <td scope="row">{{ post.date | date: "yyyy/MM/dd" }}</td>
+    </tr>
+  </thead>
+</table>

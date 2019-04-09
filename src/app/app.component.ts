@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserService } from './share/user.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'Project2';
+
+  constructor(private userService: UserService) {
+    if (localStorage.getItem('currentUser')) {
+      this.userService.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    }
+  }
+
 }

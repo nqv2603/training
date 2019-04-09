@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  baseUrl: 'http://localhost/wordpress/wp-json/wp/v2/',
+  authUrl: 'http://localhost/wordpress/wp-json/jwt-auth/v1/token'
 };
 
 /*
