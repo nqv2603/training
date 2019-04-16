@@ -10,7 +10,7 @@ export class DataService {
 
   total: number;
   totalPages: number;
-  posts: any[];
+  posts = [];
   tagsStore = {};
   categoriesStore = {};
   usersStore = {};

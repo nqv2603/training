@@ -2,19 +2,38 @@
   <div class="row">
     <div class="col-7">
       <h4 class="d-inline-block m-0">Posts</h4>
-      <button type="button" class="btn px-2 py-1 ml-3 text-primary add">Add New</button>
+      <button type="button" class="btn px-2 py-1 ml-3 text-primary add" routerLink="/post/new">Add New</button>
       <ul class="nav">
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status==''">All</a></li>
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='publish'">Published</a></li>
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='sticky'">Sticky</a></li>
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='future'">Scheduled</a></li>
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='draft'">Draft</a></li>
-        <li class="nav-item text-primary"><a class="nav-link" [class.active]="status=='trash'">Trash</a></li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('any')">
+          <a class="nav-link" [class.active]="status$.value=='any'">All</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('publish')">
+          <a class="nav-link" [class.active]="status$.value=='publish'">Published</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('sticky')">
+          <a class="nav-link" [class.active]="status$.value=='sticky'">Sticky</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('future')">
+          <a class="nav-link" [class.active]="status$.value=='future'">Scheduled</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('draft')">
+          <a class="nav-link" [class.active]="status$.value=='draft'">Draft</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('private')">
+          <a class="nav-link" [class.active]="status$.value=='private'">Private</a>
+        </li>
+        <li class="nav-item text-primary" (click)="onChangeStatus('trash')">
+          <a class="nav-link" [class.active]="status$.value=='trash'">Trash</a>
+        </li>
       </ul>
       <form class="filter">
         <div class="form-group d-inline-block">
           <select class="form-control" name="" id="">
             <option>Bulk Actions</option>
+            <option *ngIf="status!='trash'">Edit</option>
+            <option *ngIf="status!='trash'" (click)="onBulkMoveToTrash()">Move to Trash</option>
+            <option *ngIf="status=='trash'">Restore</option>
+            <option *ngIf="status=='trash'">Delete Permanently</option>
           </select>
         </div>
         <button type="button" class="btn">Apply</button>
@@ -25,7 +44,10 @@
         </div>
         <div class="form-group d-inline-block">
           <select class="form-control" name="" id="">
-            <option>All Categories</option>
+            <option (click)="onChangeCategory(0)">All Categories</option>
+            <option (click)="onChangeCategory(key)" *ngFor="let key of viewObject.keys(dataService.categories)">
+              {{ dataService.categories[key].name }}
+            </option>
           </select>
         </div>
         <button type="button" class="btn">Filter</button>
@@ -34,20 +56,21 @@
     <div class="col-5">
       <form>
         <div class="form-group w-50 d-inline-block">
-          <input type="text" class="form-control" name="" id="" placeholder="">
+          <input type="text" class="form-control" name="search" id="" placeholder="search here"
+            [ngModel]="search$.value" (ngModelChange)="onChangeSearch(searchInput.value)" #searchInput>
         </div>
         <button class="btn btn-primary ml-1">Search Posts</button>
         <div class="pagi">
           <span class="mr-2">{{ dataService.total }} items</span>
-          <button type="button" class="btn mx-1 p-1" (click)="onFirst()" [disabled]="page<=1">«</button>
-          <button type="button" class="btn mx-1 p-1" (click)="onPrev()" [disabled]="page<=1">‹</button>
-          <input type="number" class="mx-1" name="page" min="1" [max]="dataService.totalPages" [(ngModel)]="page"
-            (ngModelChange)="onChangePage()">
+          <button type="button" class="btn mx-1 p-1" (click)="onFirst()" [disabled]="page$.value<=1">«</button>
+          <button type="button" class="btn mx-1 p-1" (click)="onPrev()" [disabled]="page$.value<=1">‹</button>
+          <input type="number" class="mx-1" name="page" min="1" [max]="dataService.totalPages" [ngModel]="page$.value"
+            (ngModelChange)="onChangePage(pageInput.value)" #pageInput>
           <span class="mx-1">of {{ dataService.totalPages }}</span>
           <button type="button" class="btn mx-1 p-1" (click)="onNext()"
-            [disabled]="page>=dataService.totalPages">›</button>
+            [disabled]="page$.value>=dataService.totalPages">›</button>
           <button type="button" class="btn ml-1 p-1" (click)="onLast()"
-            [disabled]="page>=dataService.totalPages">»</button>
+            [disabled]="page$.value>=dataService.totalPages">»</button>
         </div>
       </form>
     </div>
@@ -56,17 +79,40 @@
 <table class="table table-striped mt-2">
   <thead>
     <tr>
-      <th scope="col"><input type="checkbox"></th>
-      <th scope="col">Title</th>
-      <th scope="col">Author</th>
+      <th scope="col"><input type="checkbox" (change)="onCheckAll()"
+          [checked]="viewObject.keys(check).length==dataService.posts.length">
+      </th>
+      <th class="order" scope="col" (click)="onChangeOrder('title')">Title
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='title'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='title'&&order$.value=='asc'"></i>
+      </th>
+      <th class="order" scope="col" (click)="onChangeOrder('author')">Author
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='author'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='author'&&order$.value=='asc'"></i>
+      </th>
       <th scope="col">Categories</th>
       <th scope="col">Tags</th>
       <th scope="col"><i class="fa fa-comment"></i></th>
-      <th scope="col">Date</th>
+      <th class="order" scope="col" (click)="onChangeOrder('date')">Date
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='date'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='date'&&order$.value=='asc'"></i>
+      </th>
     </tr>
-    <tr *ngFor="let post of dataService.posts">
-      <td scope="row"><input type="checkbox"></td>
-      <td scope="row">{{ post.title?.rendered }}</td>
+    <tr class="post" *ngFor="let post of dataService.posts; let i = index;">
+      <td scope="row"><input type="checkbox" [checked]="check[i]" (change)="onChangeCheckbox(i)"></td>
+      <td scope="row">
+        <span [innerHTML]="post | formatTitle"></span>
+        <div class="action" *ngIf="status$.value!='trash'">
+          <button class="text-primary border-left-0 border-bottom-0 border-top-0">Edit</button>
+          <button class="text-primary border-left-0 border-bottom-0 border-top-0">Quick Edit</button>
+          <button class="text-danger border-left-0 border-bottom-0 border-top-0" (click)="onMoveToTrash(post.id, i)">Trash</button>
+          <button class="text-primary border-0" (click)="onView(post.id)">View</button>
+        </div>
+        <div class="action" *ngIf="status$.value=='trash'">
+          <button class="text-primary border-left-0 border-bottom-0 border-top-0" (click)="onRestore(post.id)">Restore</button>
+          <button class="text-danger border-0" (click)="onDelete(post.id, i)" (click)="onDelete(post.id, i)">Delete Permanently</button>
+        </div>
+      </td>
       <td scope="row">{{ dataService.users[post.author]?.name }}</td>
       <td scope="row">
         <span *ngFor="let cateId of post.categories">
@@ -81,5 +127,27 @@
       <td scope="row">{{ post.comment_status }}</td>
       <td scope="row">{{ post.date | date: "yyyy/MM/dd" }}</td>
     </tr>
+    <tr>
+      <th scope="col"><input type="checkbox" (change)="onCheckAll()"
+          [checked]="viewObject.keys(check).length==dataService.posts.length">
+      </th>
+      <th class="order" scope="col" (click)="onChangeOrder('title')">Title
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='title'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='title'&&order$.value=='asc'"></i>
+      </th>
+      <th class="order" scope="col" (click)="onChangeOrder('author')">Author
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='author'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='author'&&order$.value=='asc'"></i>
+      </th>
+      <th scope="col">Categories</th>
+      <th scope="col">Tags</th>
+      <th scope="col"><i class="fa fa-comment"></i></th>
+      <th class="order" scope="col" (click)="onChangeOrder('date')">Date
+        <i class="fa fa-sort-down" *ngIf="orderBy$.value=='date'&&order$.value=='desc'"></i>
+        <i class="fa fa-sort-up" *ngIf="orderBy$.value=='date'&&order$.value=='asc'"></i>
+      </th>
+    </tr>
   </thead>
 </table>
+
+<app-delete-modal (isDeleted)="onConfirmDelete($event)"></app-delete-modal>

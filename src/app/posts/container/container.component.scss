@@ -46,3 +46,31 @@ button.add {
   background-color: #fafafa;
   border: 1px solid gray;
 }
+th.order:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+tr.post div.action {
+  visibility: hidden;
+}
+tr.post div.action button {
+  margin-right: 8px;
+  padding: 0 8px 0 0;
+  font-size: 0.9em;
+  // border: none;
+  background: transparent;
+}
+tr.post div.action button:hover {
+  opacity: 0.7;
+}
+tr.post:hover div.action {
+  visibility: visible;
+}
+i.fa-sort-down {
+  margin-left: 4px;
+  transform: translateY(-4px);
+}
+i.fa-sort-up {
+  margin-left: 4px;
+  transform: translateY(4px);
+}

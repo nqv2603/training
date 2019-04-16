@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PostsService } from '../posts.service';
 import { DataService } from '../data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { tap, flatMap } from 'rxjs/operators';
 import { CategoriesService } from '../categories.service';
 import { TagsService } from '../tags.service';
 import { UsersService } from '../users.service';
+import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { distinctUntilChanged, debounceTime, switchMap, filter } from 'rxjs/operators';
+import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
 
 @Component({
   selector: 'app-container',
@@ -14,9 +16,18 @@ import { UsersService } from '../users.service';
 })
 export class ContainerComponent implements OnInit {
 
-  viewArray = Array;
-  page: number;
-  status: string;
+  viewObject = Object;
+  check = {};
+  postForDelete: { id: number, index: number } = null;
+  isSticky: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  page$: BehaviorSubject<number> = new BehaviorSubject(1);
+  status$: BehaviorSubject<string> = new BehaviorSubject('any');
+  search$: BehaviorSubject<string> = new BehaviorSubject('');
+  category$: BehaviorSubject<number> = new BehaviorSubject(0);
+  orderBy$: BehaviorSubject<string> = new BehaviorSubject('date');
+  order$: BehaviorSubject<string> = new BehaviorSubject('desc');
+  reload$: BehaviorSubject<any> = new BehaviorSubject(null);
+  @ViewChild(DeleteModalComponent) deleteModal: DeleteModalComponent;
 
   constructor(
     private postsService: PostsService,
@@ -30,18 +41,29 @@ export class ContainerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.queryParams.pipe(
-      tap(params => {
-        this.page = Number(params.page) || 1;
-        this.status = params.status || '';
+    combineLatest(
+      this.page$.pipe(distinctUntilChanged()),
+      this.status$.pipe(distinctUntilChanged()),
+      this.category$.pipe(distinctUntilChanged()),
+      this.search$.pipe(distinctUntilChanged()),
+      this.orderBy$.pipe(distinctUntilChanged()),
+      this.order$.pipe(distinctUntilChanged()),
+      this.reload$
+    ).pipe(
+      debounceTime(500),
+      filter(([page, status, category, search, orderBy, order]) => {
+        return page >= 1 && page <= this.dataService.totalPages || !this.dataService.totalPages;
       }),
-      flatMap(() => this.postsService.getPosts(this.page, this.status))
+      switchMap(([page, status, category, search, orderBy, order]) => {
+        return this.postsService.getAll(page, status, category, search, orderBy, order);
+      })
     ).subscribe(
       data => {
-        console.log(data.posts);
+        console.log(data);
+        this.check = {};
         this.dataService.total = data.total;
         this.dataService.totalPages = data.totalPages;
-        this.dataService.posts = data.posts as any[];
+        this.dataService.posts = data.posts;
       }
     );
 
@@ -67,29 +89,100 @@ export class ContainerComponent implements OnInit {
     );
   }
 
-  onChangePage() {
-    this.router.navigate([''], { queryParams: { page: this.page } });
+  onChangePage(page: number) {
+    this.page$.next(page);
+  }
+
+  onChangeStatus(status: string) {
+    this.status$.next(status);
+  }
+
+  onChangeSearch(search: string) {
+    this.search$.next(search);
+  }
+
+  onChangeCategory(category: number) {
+    this.category$.next(category);
+  }
+
+  onCheckAll() {
+    if (Object.keys(this.check).length < this.dataService.posts.length) {
+      Object.keys(this.dataService.posts).forEach((value, index) => {
+        this.check[index] = true;
+      });
+    } else {
+      this.check = {};
+    }
+  }
+
+  onChangeOrder(orderBy: string) {
+    if (orderBy !== this.orderBy$.value) {
+      this.orderBy$.next(orderBy);
+    } else {
+      this.order$.value === 'desc' ? this.order$.next('asc') : this.order$.next('desc');
+    }
+  }
+
+  onChangeCheckbox(index: number) {
+    if (this.check[index]) {
+      delete this.check[index];
+    } else {
+      this.check[index] = true;
+    }
   }
 
   onPrev() {
-    if (this.page > 1) {
-      this.router.navigate([''], { queryParams: { page: --this.page } });
+    if (this.page$.value > 1) {
+      this.onChangePage(this.page$.value - 1);
     }
   }
 
   onNext() {
-    if (this.page < this.dataService.totalPages) {
-      this.router.navigate([''], { queryParams: { page: ++this.page } });
+    if (this.page$.value < this.dataService.totalPages) {
+      this.onChangePage(this.page$.value + 1);
     }
 
   }
 
   onFirst() {
-    this.router.navigate([''], { queryParams: { page: 1 } });
+    this.onChangePage(1);
   }
 
   onLast() {
-    this.router.navigate([''], { queryParams: { page: this.dataService.totalPages } });
+    this.onChangePage(this.dataService.totalPages);
   }
 
+  onMoveToTrash(id: number, index: number) {
+    this.postsService.moveToTrash(id).subscribe(
+      () => {
+        this.reload$.next(null);
+        delete this.check[index];
+      }
+    );
+  }
+
+  onDelete(id: number, index: number) {
+    this.postForDelete = { id, index };
+    this.deleteModal.showModal();
+  }
+
+  onConfirmDelete(event: boolean) {
+    this.postsService.delete(this.postForDelete.id).subscribe(
+      () => {
+        this.reload$.next(null);
+        delete this.check[this.postForDelete.index];
+        this.deleteModal.closeModal();
+      }
+    );
+  }
+
+  onBulkMoveToTrash() {
+    Object.keys(this.check).forEach(key => {
+      this.onMoveToTrash(this.dataService.posts[key].id, Number(key));
+    });
+  }
+
+  onView(id: number) {
+    this.router.navigate(['post', id]);
+  }
 }
