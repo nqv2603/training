@@ -1,0 +1,6 @@
+<div *ngIf="currentPost">
+  <h1>Title: {{currentPost.title.rendered}}</h1>
+  <p>Content: {{currentPost.content.rendered}}</p>
+  <p>Author: {{dataService.users[currentPost.author].name}}</p>
+  <p>Date: {{currentPost.date | date:'yyyy/MM/dd'}}</p>
+</div>
