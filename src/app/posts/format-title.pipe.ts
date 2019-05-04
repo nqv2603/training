@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class FormatTitlePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
-    let result = `<span class="text-primary font-weight-bold">${value.title.rendered}</span>`;
+    let result = `<span class="text-primary font-weight-bold">${value.title.rendered || '(no title)'}</span>`;
     let isNewNote = false;
     if (value.content.protected) {
       isNewNote = true;

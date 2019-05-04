@@ -1,0 +1,54 @@
+<div class="container-fluid p-4">
+    <div class="row">
+      <div class="col-4">
+        <h4 class="font-weight-bold">Add New Category</h4>
+        <form [formGroup]="categoryForm">
+          <div class="form-group">
+            <label for="tag-name">Name</label>
+            <span class="text-danger ml-2" *ngIf="name.touched && name.invalid">* Name is required</span>
+            <input type="text" class="form-control" id="tag-name" placeholder="" formControlName="name">
+          </div>
+          <div class="form-group">
+            <label for="tag-slug">Slug</label>
+            <span class="text-danger ml-2" *ngIf="slugError">* This slug is not available</span>
+            <input type="text" class="form-control" id="tag-slug" placeholder="" formControlName="slug">
+          </div>
+          <div class="form-group">
+            <label for="parent-category">Parent Category</label>
+            <select class="form-control" name="parent-category" id="parent-category" formControlName="parent">
+              <option [ngValue]="null">None</option>
+              <option *ngFor="let key of viewObject.keys(dataService.categories)" [ngValue]="key">
+                {{ dataService.categories[key].name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tag-description">Description</label>
+            <textarea class="form-control" name="" id="tag-description" rows="4" style="overflow-x: hidden;" formControlName="description"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" (click)="onCreateNewCategory()">Add New Tag</button>
+        </form>
+      </div>
+      <div class="col-8">
+        <table class="table table-striped mt-2">
+          <thead>
+            <tr>
+              <th><input type="checkbox" [checked]=""></th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Slug</th>
+              <th>Count</th>
+            </tr>
+          <tbody>
+            <tr *ngFor="let key of viewObject.keys(dataService.categories)">
+              <td scope="col"><input type="checkbox" [checked]=""></td>
+              <td>{{ dataService.categories[key].name }}</td>
+              <td>{{ dataService.categories[key].description }}</td>
+              <td>{{ dataService.categories[key].slug }}</td>
+              <td>{{ dataService.categories[key].count }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

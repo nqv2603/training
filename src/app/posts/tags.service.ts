@@ -48,4 +48,8 @@ export class TagsService {
         )
       );
   }
+
+  creat(option: any) {
+    return this.httpClient.post(environment.baseUrl + 'tags', option);
+  }
 }

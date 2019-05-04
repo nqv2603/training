@@ -1,0 +1,83 @@
+<form class="form-inline" style="flex-direction: column; align-items: flex-start;">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-5">
+        <p class="h6 font-weight-bold">Quick Edit</p>
+        <div class="form-group mb-2">
+          <label for="quick-edit-title" style="width: 4em; display: inline-block;">Title</label>
+          <input type="text" name="title" id="quick-edit-title" class="form-control" placeholder="" [(ngModel)]="title">
+        </div>
+        <div class="form-group mb-2">
+          <label for="quick-edit-slug" style="width: 4em; display: inline-block;">Slug</label>
+          <input type="text" name="slug" id="quick-edit-slug" class="form-control" placeholder="" [(ngModel)]="slug">
+        </div>
+        <div class="form-group mb-2">
+          <label style="display: inline-block; width: 4em;">Date</label>
+          <select class="form-control" name="month" [ngModel]="tempDate.getMonth()">
+            <option value="0">Jan</option>
+            <option value="1">Feb</option>
+            <option value="2">Mar</option>
+            <option value="3">Apr</option>
+            <option value="4">May</option>
+            <option value="5">Jun</option>
+            <option value="6">Jul</option>
+            <option value="7">Aug</option>
+            <option value="8">Sep</option>
+            <option value="9">Oct</option>
+            <option value="10">Nov</option>
+            <option value="11">Dec</option>
+          </select>
+          <input type="number" class="form-control ml-1" style="display: inline-block; width: 4em;"
+            [value]="tempDate.getDate()">,
+          <input type="number" class="form-control ml-1" style="display: inline-block; width: 6em;"
+            [value]="tempDate.getYear()">@
+          <input type="number" class="form-control ml-1" style="display: inline-block; width: 4em;" min="0" max="23"
+            [value]="tempDate.getHours()">
+          <input type="number" class="form-control ml-1" style="display: inline-block; width: 4em;" min="0" max="59"
+            [value]="tempDate.getMinutes()">
+        </div>
+        <div class="form-group">
+          <label style="display: inline-block; width: 4em;">Pasword</label>
+          <input type="text" name="password" class="form-control" [disabled]="status=='private'" [(ngModel)]="password">
+          <span class="mx-2">OR</span>
+          <input type="checkbox" name="" [checked]="status=='private'" (change)="onChangePrivate()">Private
+        </div>
+      </div>
+      <div class="col-2 p-0">
+        <div class="w-100; p-2" style="overflow-y: auto; height: 200px; background-color: #fefefe;">
+          <div class="form-check d-block" *ngFor="let key of viewObject.keys(dataService.categories)">
+            <label class="form-check-label d-block">
+              <input type="checkbox" class="form-check-input" name="" value="checkedValue"
+                [checked]="categories.indexOf(dataService.categories[key].id)>-1"
+                (change)="onChangeCategories(dataService.categories[key].id)">
+              {{ dataService.categories[key].name }}
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="col-5 pl-4">
+        <label class="d-block" for="">Tags</label>
+        <textarea class="form-control d-inline-block w-100" name="tags" id="" rows="3" style="overflow-x: hidden"
+          [(ngModel)]="tempTags"></textarea>
+        <div class="form-group d-inline-block pt-2">
+          <label class="d-inline-block mr-2" for="">Status</label>
+          <select class="form-control" name="status" (change)="onChangeStatus($event.target.value)">
+            <option value="publish" [selected]="status=='publish'">Published</option>
+            <option value="pending" [selected]="status=='pending'">Pending Review</option>
+            <option value="draft" [selected]="status=='draft'">Draft</option>
+          </select>
+        </div>
+        <div class="form-check d-inline-block ml-2 pt-2">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" name="sticky" value="checkedValue" [(ngModel)]="sticky">
+            Make sticky
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-3" style="display: flex; justify-content: space-between; width: 100%;">
+    <button class="btn btn-sm btn-light" (click)="onCancelQuickEdit()">Cancel</button>
+    <button class="btn btn-sm btn-primary" (click)="onUpdateQuickEdit()">Update</button>
+  </div>
+</form>

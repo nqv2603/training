@@ -8,6 +8,7 @@ import { UsersService } from '../users.service';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { distinctUntilChanged, debounceTime, switchMap, filter } from 'rxjs/operators';
 import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-container',
@@ -18,6 +19,7 @@ export class ContainerComponent implements OnInit {
 
   viewObject = Object;
   check = {};
+  quickEdit: number = null;
   postForDelete: { id: number, index: number } = null;
   isSticky: BehaviorSubject<boolean> = new BehaviorSubject(false);
   page$: BehaviorSubject<number> = new BehaviorSubject(1);
@@ -64,27 +66,6 @@ export class ContainerComponent implements OnInit {
         this.dataService.total = data.total;
         this.dataService.totalPages = data.totalPages;
         this.dataService.posts = data.posts;
-      }
-    );
-
-    this.categoriesService.getAllCategories().subscribe(
-      data => {
-        this.dataService.categories = data;
-        console.log('cate', this.dataService.categories);
-      }
-    );
-
-    this.tagsService.getAllTags().subscribe(
-      data => {
-        this.dataService.tags = data;
-        console.log('tag', this.dataService.tags);
-      }
-    );
-
-    this.usersService.getAllUsers().subscribe(
-      data => {
-        this.dataService.users = data;
-        console.log('user', this.dataService.users);
       }
     );
   }
@@ -184,5 +165,25 @@ export class ContainerComponent implements OnInit {
 
   onView(id: number) {
     this.router.navigate(['post', id]);
+  }
+
+  onShowQuickEdit(index: number) {
+    this.quickEdit = index;
+  }
+
+  onCancelQuickEdit() {
+    this.quickEdit = null;
+  }
+
+  onUpdateQuickEdit(option: any) {
+    this.postsService.update(this.dataService.posts[this.quickEdit].id, option).subscribe(
+      data => {
+        this.dataService.posts[this.quickEdit] = data;
+        this.quickEdit = null;
+      },
+      (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    );
   }
 }

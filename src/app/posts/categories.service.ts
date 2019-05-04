@@ -48,4 +48,8 @@ export class CategoriesService {
         )
       );
   }
+
+  create(option: any) {
+    return this.httpClient.post(environment.baseUrl + 'categories', option);
+  }
 }

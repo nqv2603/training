@@ -3,12 +3,16 @@ import { Routes, RouterModule } from '@angular/router';
 import { ContainerComponent } from './container/container.component';
 import { DetailComponent } from './detail/detail.component';
 import { NewComponent } from './new/new.component';
+import { TagsComponent } from './tags/tags.component';
+import { CategoriesComponent } from './categories/categories.component';
 
 const routes: Routes = [
-  { path: '', component: ContainerComponent },
+  { path: 'posts', component: ContainerComponent },
   { path: 'post/new', component: NewComponent },
   { path: 'post/:id', component: DetailComponent },
-  { path: '**', redirectTo: ''}
+  { path: 'categories', component: CategoriesComponent},
+  { path: 'tags', component: TagsComponent},
+  { path: '**', redirectTo: 'posts'}
 ];
 
 @NgModule({

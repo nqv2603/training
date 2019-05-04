@@ -42,6 +42,13 @@ export class PostsService {
     return this.httpClient.delete(environment.baseUrl + 'posts/' + id);
   }
 
+  update(id: number, option: any) {
+    return this.httpClient.put(
+      environment.baseUrl + 'posts/' + id,
+      option
+    );
+  }
+
   delete(id: number) {
     return this.httpClient.delete(
       environment.baseUrl + 'posts/' + id,

@@ -99,33 +99,46 @@
       </th>
     </tr>
     <tr class="post" *ngFor="let post of dataService.posts; let i = index;">
-      <td scope="row"><input type="checkbox" [checked]="check[i]" (change)="onChangeCheckbox(i)"></td>
-      <td scope="row">
-        <span [innerHTML]="post | formatTitle"></span>
-        <div class="action" *ngIf="status$.value!='trash'">
-          <button class="text-primary border-left-0 border-bottom-0 border-top-0">Edit</button>
-          <button class="text-primary border-left-0 border-bottom-0 border-top-0">Quick Edit</button>
-          <button class="text-danger border-left-0 border-bottom-0 border-top-0" (click)="onMoveToTrash(post.id, i)">Trash</button>
-          <button class="text-primary border-0" (click)="onView(post.id)">View</button>
-        </div>
-        <div class="action" *ngIf="status$.value=='trash'">
-          <button class="text-primary border-left-0 border-bottom-0 border-top-0" (click)="onRestore(post.id)">Restore</button>
-          <button class="text-danger border-0" (click)="onDelete(post.id, i)" (click)="onDelete(post.id, i)">Delete Permanently</button>
-        </div>
+      <ng-container *ngIf="quickEdit!=i">
+        <td scope="row">
+          <input type="checkbox" [checked]="check[i]" (change)="onChangeCheckbox(i)">
+        </td>
+        <td scope="row">
+          <span [innerHTML]="post | formatTitle"></span>
+          <div class="action" *ngIf="status$.value!='trash'">
+            <button class="text-primary border-left-0 border-bottom-0 border-top-0">Edit</button>
+            <button class="text-primary border-left-0 border-bottom-0 border-top-0" (click)="onShowQuickEdit(i)">Quick
+              Edit</button>
+            <button class="text-danger border-left-0 border-bottom-0 border-top-0"
+              (click)="onMoveToTrash(post.id, i)">Trash</button>
+            <button class="text-primary border-0" (click)="onView(post.id)">View</button>
+          </div>
+          <div class="action" *ngIf="status$.value=='trash'">
+            <button class="text-primary border-left-0 border-bottom-0 border-top-0"
+              (click)="onRestore(post.id)">Restore</button>
+            <button class="text-danger border-0" (click)="onDelete(post.id, i)" (click)="onDelete(post.id, i)">Delete
+              Permanently</button>
+          </div>
+        </td>
+        <td scope="row">{{ dataService.users[post.author]?.name }}</td>
+        <td scope="row">
+          <span *ngFor="let cateId of post.categories">
+            {{ dataService.categories[cateId]?.name }},
+          </span>
+        </td>
+        <td scope="row">
+          <span *ngFor="let tagId of post.tags">
+            {{ dataService.tags[tagId]?.name }},
+          </span>
+        </td>
+        <td scope="row">{{ post.comment_status }}</td>
+        <td scope="row">{{ post.date | date: "yyyy/MM/dd" }}</td>
+      </ng-container>
+      <td colspan="7" *ngIf="quickEdit==i">
+        <app-quick-edit [title]="post.title.rendered" [slug]="post.slug" [date]="post.date" [status]="post.status"
+          [sticky]="post.sticky" [categories]="post.categories" [tags]="post.tags" (cancel)="onCancelQuickEdit($event)" (update)="onUpdateQuickEdit($event)">
+        </app-quick-edit>
       </td>
-      <td scope="row">{{ dataService.users[post.author]?.name }}</td>
-      <td scope="row">
-        <span *ngFor="let cateId of post.categories">
-          {{ dataService.categories[cateId]?.name }},
-        </span>
-      </td>
-      <td scope="row">
-        <span *ngFor="let tagId of post.tags">
-          {{ dataService.tags[tagId]?.name }},
-        </span>
-      </td>
-      <td scope="row">{{ post.comment_status }}</td>
-      <td scope="row">{{ post.date | date: "yyyy/MM/dd" }}</td>
     </tr>
     <tr>
       <th scope="col"><input type="checkbox" (change)="onCheckAll()"
