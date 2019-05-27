@@ -12,6 +12,9 @@ import { DeleteModalComponent } from './delete-modal/delete-modal.component';
 import { QuickEditComponent } from './quick-edit/quick-edit.component';
 import { TagsComponent } from './tags/tags.component';
 import { CategoriesComponent } from './categories/categories.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { TagInputModule } from 'ngx-chips';
+import { MediaModalComponent } from './media-modal/media-modal.component';
 
 @NgModule({
   declarations: [
@@ -22,14 +25,17 @@ import { CategoriesComponent } from './categories/categories.component';
     DeleteModalComponent,
     QuickEditComponent,
     TagsComponent,
-    CategoriesComponent
+    CategoriesComponent,
+    MediaModalComponent,
   ],
   imports: [
     CommonModule,
     PostsRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    CKEditorModule,
+    TagInputModule,
   ]
 })
 export class PostsModule { }

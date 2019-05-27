@@ -1,0 +1,25 @@
+#mediaModal > .modal-dialog {
+  max-width: 90%;
+}
+a.nav-link {
+  cursor: pointer;
+}
+a.nav-link.active {
+  color: blue;
+}
+.content {
+  min-height: 300px;
+
+  img {
+    margin: 1em 0.5em;
+    object-fit: cover;
+    height: 150px;
+    width: 150px;
+    cursor: pointer;
+
+    &.active {
+      outline-offset: 0.1em;
+      outline: 0.2em solid blue;
+    }
+  }
+}

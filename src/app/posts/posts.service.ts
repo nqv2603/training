@@ -58,6 +58,13 @@ export class PostsService {
     );
   }
 
+  create(option: any) {
+    return this.httpClient.post(
+      environment.baseUrl + 'posts',
+      option
+    );
+  }
+
   buildGetPostsParams(page: number, status: string, category: number, search: string, orderBy: string, order: string): HttpParams {
     let params = new HttpParams().set('page', page.toString());
     params = params.append('status', (status !== 'sticky') ? status : 'any');

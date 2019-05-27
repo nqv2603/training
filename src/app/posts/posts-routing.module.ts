@@ -5,10 +5,11 @@ import { DetailComponent } from './detail/detail.component';
 import { NewComponent } from './new/new.component';
 import { TagsComponent } from './tags/tags.component';
 import { CategoriesComponent } from './categories/categories.component';
+import { NewGuardService } from './new-guard.service';
 
 const routes: Routes = [
   { path: 'posts', component: ContainerComponent },
-  { path: 'post/new', component: NewComponent },
+  { path: 'post/new', component: NewComponent, canDeactivate: [NewGuardService] },
   { path: 'post/:id', component: DetailComponent },
   { path: 'categories', component: CategoriesComponent},
   { path: 'tags', component: TagsComponent},

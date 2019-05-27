@@ -1,12 +1,166 @@
-<div class="container">
-  <form>
-    <div class="row">
-      <div class="col-8">
-        aaaaaaaaaaaaaaaaaaa
+<div class="container-fluid">
+  <ul class="nav justify-content-end">
+    <li class="nav-item pt-2 pr-2" *ngIf="isSaved">
+      <span class="btn text-black-50 px-0">
+        <i class="fa fa-check"></i>
+        Saved
+      </span>
+    </li>
+    <li class="nav-item pt-2 pr-2" *ngIf="!isSaved && (title || content)">
+      <button class="btn text-primary" (click)="onSaveDraft()">Save Draft</button>
+    </li>
+    <li class="nav-item pt-2 pr-2">
+      <button class="btn btn-primary" [disabled]="!title && !content" (click)="onPublish()">Publish...</button>
+    </li>
+  </ul>
+  <hr class="p-0">
+  <div class="row">
+    <div class="col-8">
+      <form>
+        <div class="form-group">
+          <input #titleInput type="text" class="form-control" name="title" id="" placeholder="Add title"
+            (keyup)="onChange()">
+        </div>
+        <ckeditor [editor]="editor" [config]="config" (change)="onChange($event)"></ckeditor>
+      </form>
+    </div>
+    <div class="col-4 bg-white">
+      <div>
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#collapseStatus" role="button" aria-expanded="false"
+            aria-controls="collapseStatus">Status & Visibility
+          </a>
+        </p>
+        <div class="collapse" id="collapseStatus">
+          <div class="mb-3">
+            <span>Visibility</span>
+            <a style="float: right;">Pubic</a>
+          </div>
+          <div class="mb-3">
+            <span>Publish</span>
+            <a style="float: right;">Immediately</a>
+          </div>
+          <div class="form-check mb-3">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" name="sticky" id="" [(ngModel)]="sticky">
+              Stick to the Front Page
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" name="" id="" value="pending">
+              Pending Review
+            </label>
+          </div>
+        </div>
       </div>
-      <div class="col-4">
-        bbbbbbbbbbbbbbbbbbbb
+      <div *ngIf="id">
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#collapseLink" role="button" aria-expanded="false"
+            aria-controls="collapseLink">PermaLink
+          </a>
+        </p>
+        <div class="collapse" id="collapseLink">
+          <p class="m-0">Preview</p>
+          <a href="http://localhost:4200/post/ + {{id}}" target="_blank">
+            http://localhost:4200/post/{{id}}
+          </a>
+        </div>
+      </div>
+      <div>
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#collapseCategories" role="button"
+            aria-expanded="false" aria-controls="collapseCategories">Categories
+          </a>
+        </p>
+        <div class="collapse" id="collapseCategories">
+          <div class="form-group">
+            <label for="">Search Categories</label>
+            <input type="text" class="form-control" placeholder="Search a category" value=""
+              (keyup)="onSearchCategory($event)">
+          </div>
+          <div class="form-check" style="max-height: 200px; overflow: auto;">
+            <label class="form-check-label w-100" *ngFor="let category of categories">
+              <input type="checkbox" class="form-check-input" [value]="category.id"
+                (change)="onSelectCategory(category.id)">{{ category.name }}
+            </label>
+          </div>
+          <div>
+            <p class="m-0 py-2">
+              <a class="font-weight-bold" style="font-size: 0.9em;" data-toggle="collapse" href="#collapseNewCategory"
+                role="button" aria-expanded="false" aria-controls="collapseNewCategory">Add New Category
+              </a>
+            </p>
+            <div class="collapse" id="collapseNewCategory">
+              <div class="form-group">
+                <label for="">New Category Name</label>
+                <input type="text" class="form-control" placeholder="Enter a new category" #newName>
+              </div>
+              <div class="form-group">
+                <label for="">Parent Category</label>
+                <select class="form-control" #newParent>
+                  <option [value]="null">-- Parent Category --</option>
+                  <option *ngFor="let key of viewObject.keys(dataService.categories)"
+                    [value]="dataService.categories[key]?.id">
+                    {{ dataService.categories[key]?.name }}
+                  </option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm"
+                (click)="onAddNewCategory(newName.value, newParent.value);newName.value=null;">Add New Category</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#collapseTags" role="button" aria-expanded="false"
+            aria-controls="collapseTags">Tags
+          </a>
+        </p>
+        <div class="collapse" id="collapseTags">
+          <tag-input [(ngModel)]='tags' theme='bootstrap'></tag-input>
+        </div>
+      </div>
+      <div>
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#collapseImage" role="button" aria-expanded="false"
+            aria-controls="collapseImage">Featured Image
+          </a>
+        </p>
+        <div class="collapse" id="collapseImage">
+          <div *ngIf="media?.id" class="mb-2" style="width: 100%; height: 100%;">
+            <img [src]="media?.source_url" alt="" style="max-width: 100%; max-height: 100%;">
+          </div>
+          <button class="btn btn-primary" (click)="onShowMediaModal()">
+            {{ media ? 'Replace image' : 'Set featured image' }}
+          </button>
+          <button class="btn btn-danger ml-2" *ngIf="media" (click)="removeMedia()">Remove featured image</button>
+        </div>
+      </div>
+      <div>
+        <p class="m-0 py-2">
+          <a class="font-weight-bold" data-toggle="collapse" href="#discussion" role="button" aria-expanded="false"
+            aria-controls="discussion">Discussion
+          </a>
+        </p>
+        <div class="collapse" id="discussion">
+          <div class="form-check mb-3">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" checked>
+              Allow Comments
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" checked>
+              Allow Pingbacks & Trachbacks
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-  </form>
+  </div>
 </div>
+
+<app-media-modal (selectMedia)="onSelectMedia($event)"></app-media-modal>

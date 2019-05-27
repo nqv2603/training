@@ -16,11 +16,11 @@ export class DeleteModalComponent implements OnInit {
   }
 
   showModal() {
-    $('#exampleModal').modal('toggle');
+    $('#deleteModal').modal('toggle');
   }
 
   closeModal() {
-    $('#exampleModal').modal('hide');
+    $('#deleteModal').modal('hide');
   }
 
   onConfirmDelete() {

@@ -1,6 +1,15 @@
-<div *ngIf="currentPost">
-  <h1>Title: {{currentPost.title.rendered}}</h1>
-  <p>Content: {{currentPost.content.rendered}}</p>
-  <p>Author: {{dataService.users[currentPost.author].name}}</p>
-  <p>Date: {{currentPost.date | date:'yyyy/MM/dd'}}</p>
+<div *ngIf="currentPost" style="margin-left: 32px; margin-top: 16px;">
+  <h1>{{currentPost.title.rendered}}</h1>
+  <p [innerHTML]="currentPost.content.rendered"></p>
+  <img [src]="media?.guid.rendered" alt="" style="max-width: 300px; max-height: 200px;" *ngIf="media">
+  <div class="mt-3">
+    <span class="mr-3">
+      <i class="fa fa-user"></i>
+      {{dataService.users[currentPost.author]?.name}}
+    </span>
+    <span>
+      <i class="fa fa-clock-o"></i>
+      {{currentPost.date | date:'yyyy/MM/dd'}}
+    </span>
+  </div>
 </div>

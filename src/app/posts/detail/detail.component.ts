@@ -4,6 +4,7 @@ import { switchMap } from 'rxjs/operators';
 import { PostsService } from '../posts.service';
 import { DataService } from '../data.service';
 import { Post } from '../interface/post';
+import { Media } from '../interface/media';
 
 @Component({
   selector: 'app-detail',
@@ -13,6 +14,7 @@ import { Post } from '../interface/post';
 export class DetailComponent implements OnInit {
 
   currentPost: Post;
+  media: Media;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -26,7 +28,7 @@ export class DetailComponent implements OnInit {
     ).subscribe(
       data => {
         this.currentPost = data[0];
-        console.log(this.currentPost);
+        this.media = this.dataService.findMediaById(this.currentPost.featured_media);
       }
     );
   }
